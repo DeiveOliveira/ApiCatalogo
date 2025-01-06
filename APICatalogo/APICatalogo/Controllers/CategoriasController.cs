@@ -20,20 +20,21 @@ namespace APICatalogo.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
-            return _context.Categorias.ToList();
+            return _context.Categorias.Take(10).AsNoTracking().ToList();
         }
 
         [HttpGet("produtos")]
         public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos() 
         {
-            return _context.Categorias.Include(p => p.Produtos).ToList();
+            return _context.Categorias.Take(10).Include(p => p.Produtos).Where(C => C.CategoriaId <= 3).ToList();
         }
 
 
         [HttpGet("{id:int}", Name = "ObterCategorias")]
         public ActionResult<Categoria> Get(int id)
         {
-            var categoria = _context.Categorias.FirstOrDefault(p => p.CategoriaId == id);
+            var categoria = _context.Categorias.AsNoTracking().FirstOrDefault(p => p.CategoriaId == id);
+        
             if (categoria == null) return NotFound("Categoria não encontrada...");
 
             return Ok(categoria);
