@@ -20,26 +20,44 @@ namespace APICatalogo.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Produto>> Get()
         {
-            var produtos = _context.Produtos.Take(5).AsNoTracking().ToList();
+            try
+            {
+            var produtos = _context.Produtos.AsNoTracking().ToList();
 
             if(produtos is null) return NotFound("Produtos não encontrados.....");
             
             return produtos;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Ocorreu um problema ao tratar sua solicitação!");
+            }
         }
 
         [HttpGet("{id:int}", Name="ObterProduto")]
         public ActionResult<Produto> Get(int id)
         {
+            try
+            {
             var produto = _context.Produtos.AsNoTracking().SingleOrDefault(p => p.ProdutoId == id);
            
             if (produto is null) return NotFound("Produto não encontrado...");
             
             return produto;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Ocorreu um problema ao tratar sua solicitação!");
+            }
         }
 
         [HttpPost]
         public ActionResult Post(Produto produto)
         {
+            try
+            {
             if (produto is null) return BadRequest();
 
             _context.Produtos.Add(produto);
@@ -47,23 +65,39 @@ namespace APICatalogo.Controllers
 
             return new CreatedAtRouteResult("ObterProduto",
                    new { id = produto.ProdutoId }, produto);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Ocorreu um problema ao tratar sua solicitação!");
+            }
         }
 
         [HttpPut("{id:int}")]
         public ActionResult Put(int id, Produto produto)
         {
+            try
+            {
             if (id != produto.ProdutoId) return BadRequest("Produtos diferentes");
 
             _context.Entry(produto).State = EntityState.Modified;
             _context.SaveChanges();
 
             return Ok(produto);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Ocorreu um problema ao tratar sua solicitação!");
+            }
             
         }
 
         [HttpDelete("{id:int}")]
         public ActionResult Delete(int id) 
         {
+            try
+            {
             var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
             
             //Usando o Find, ele tenta localizar primeiro na memória, porem a chave deve ser uma Primary Key
@@ -76,7 +110,12 @@ namespace APICatalogo.Controllers
             _context.SaveChanges();
 
             return Ok(produto);
-
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "Ocorreu um problema ao tratar sua solicitação!");
+            }
         }
 
     }
