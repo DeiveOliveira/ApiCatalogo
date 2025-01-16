@@ -31,5 +31,5 @@ namespace APICatalogo.Filters
             _logger.LogInformation("#############################################");
         }
     }
-    }
+    
 }

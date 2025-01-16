@@ -11,15 +11,19 @@ namespace APICatalogo.Controllers
     public class ProdutosController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly ILogger _logger;
 
-        public ProdutosController(AppDbContext context)
+        public ProdutosController(AppDbContext context, ILogger<ProdutosController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Produto>>> Get()
         {
+            _logger.LogInformation("***************** GET  API/PRODUTOS ***************** ");
+
             try
             {
             var produtos = await _context.Produtos.AsNoTracking().ToListAsync();
@@ -28,8 +32,10 @@ namespace APICatalogo.Controllers
             
             return produtos;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "***************** Erro ao obetr produtos  GET  API/PRODUTOS *******************");
+
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     "Ocorreu um problema ao tratar sua solicitação!");
             }
@@ -38,6 +44,7 @@ namespace APICatalogo.Controllers
         [HttpGet("{id:int}", Name="ObterProduto")]
         public async Task<ActionResult<Produto>> Get(int id)
         {
+            _logger.LogInformation("***************** GET  API/PRODUTOS/ID ***************** ");
 
             try
             {
@@ -47,8 +54,10 @@ namespace APICatalogo.Controllers
             
             return produto;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "***************** Erro ao obetr Produto por ID  GET  API/PRODUTOS/ID *******************");
+
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     "Ocorreu um problema ao tratar sua solicitação!");
             }
@@ -57,6 +66,8 @@ namespace APICatalogo.Controllers
         [HttpPost]
         public ActionResult Post(Produto produto)
         {
+            _logger.LogInformation("***************** POST  API/PRODUTOS ***************** ");
+
             try
             {
             if (produto is null) return BadRequest();
@@ -67,8 +78,10 @@ namespace APICatalogo.Controllers
             return new CreatedAtRouteResult("ObterProduto",
                    new { id = produto.ProdutoId }, produto);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "***************** Erro ao tentar SALVAR novo Produto  POST  API/PRODUTOS *******************");
+
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     "Ocorreu um problema ao tratar sua solicitação!");
             }
@@ -77,6 +90,8 @@ namespace APICatalogo.Controllers
         [HttpPut("{id:int}")]
         public ActionResult Put(int id, Produto produto)
         {
+            _logger.LogInformation("***************** PUT  API/PRODUTOS/ID ***************** ");
+
             try
             {
             if (id != produto.ProdutoId) return BadRequest("Produtos diferentes");
@@ -86,8 +101,10 @@ namespace APICatalogo.Controllers
 
             return Ok(produto);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "***************** Erro ao tentar ATUALIZAR Produto  PUT  API/PRODUTOS/ID *******************");
+
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     "Ocorreu um problema ao tratar sua solicitação!");
             }
@@ -97,6 +114,8 @@ namespace APICatalogo.Controllers
         [HttpDelete("{id:int}")]
         public ActionResult Delete(int id) 
         {
+            _logger.LogInformation("***************** DELETE  API/PRODUTOS/ID ***************** ");
+
             try
             {
             var produto = _context.Produtos.FirstOrDefault(p => p.ProdutoId == id);
@@ -112,8 +131,10 @@ namespace APICatalogo.Controllers
 
             return Ok(produto);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "***************** Erro ao tentar EXCLUIR PRODUTO  API/PRODUTOS/ID *******************");
+
                 return StatusCode(StatusCodes.Status500InternalServerError,
                     "Ocorreu um problema ao tratar sua solicitação!");
             }
