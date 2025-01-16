@@ -1,6 +1,7 @@
 using APICatalogo.Context;
 using APICatalogo.Extensions;
 using APICatalogo.Filters;
+using APICatalogo.Logging;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -21,6 +22,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 //Add filtro
 builder.Services.AddScoped<ApiLoggingFilter>();
+
+//ADD logger customizado
+//builder.Logging.AddProvider(new CustomerLoggerProvider(new CustomLoggerProviderConfiguration
+//{
+//    LogLevel = LogLevel.Information
+//}));
 
 var app = builder.Build();
 
