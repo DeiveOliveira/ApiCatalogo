@@ -1,6 +1,6 @@
 ﻿using APICatalogo.Context;
+using APICatalogo.Filters;
 using APICatalogo.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,65 +11,53 @@ namespace APICatalogo.Controllers
     public class CategoriasController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly ILogger _logger;
 
-        public CategoriasController(AppDbContext context)
+        public CategoriasController(AppDbContext context, ILogger<CategoriasController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet]
+        [ServiceFilter(typeof(ApiLoggingFilter))]
         public ActionResult<IEnumerable<Categoria>> Get()
         {
-            try
-            {
-               return _context.Categorias.AsNoTracking().ToList();
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Ocorreu um problema ao tratar sua solicitação!");
-            }
-           
+            _logger.LogInformation("***************** GET  API/CATEGORIAS ***************** ");
+
+            return _context.Categorias.AsNoTracking().ToList();
         }
 
         [HttpGet("produtos")]
-        public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos() 
+        public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
         {
-            try
-            {
+            _logger.LogInformation("***************** GET  API/CATEGORIAS/PRODUTOS ***************** ");
+
+
             return _context.Categorias.Include(p => p.Produtos).Where(C => C.CategoriaId <= 3).ToList();
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                     "Ocorreu um problema ao tratar sua solicitação!");
-            }
         }
 
 
         [HttpGet("{id:int}", Name = "ObterCategorias")]
         public ActionResult<Categoria> Get(int id)
         {
-            try
-            {
+            _logger.LogInformation("***************** GET  API/CATEGORIAS/ID ***************** ");
+
+
             var categoria = _context.Categorias.AsNoTracking().FirstOrDefault(p => p.CategoriaId == id);
-        
+
             if (categoria == null) return NotFound("Categoria não encontrada...");
 
             return Ok(categoria);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Ocorreu um problema ao tratar sua solicitação!");
-            }
         }
 
         [HttpPost]
         public ActionResult Post(Categoria categoria)
         {
-            try
-            {
+            _logger.LogInformation("***************** POST  API/CATEGORIAS ***************** ");
+
+
+
             if (categoria is null) return BadRequest();
 
             _context.Categorias.Add(categoria);
@@ -77,40 +65,28 @@ namespace APICatalogo.Controllers
 
             return new CreatedAtRouteResult("ObterProduto",
                    new { id = categoria.CategoriaId }, categoria);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Ocorreu um problema ao tratar sua solicitação!");
-            }
         }
 
 
         [HttpPut("{id:int}")]
         public ActionResult Put(int id, Categoria categoria)
         {
-            try
-            {
+            _logger.LogInformation("***************** PUT  API/CATEGORIAS/ID ***************** ");
+
+
             if (id != categoria.CategoriaId) return BadRequest("Categoria diferentes....");
 
             _context.Entry(categoria).State = EntityState.Modified;
             _context.SaveChanges();
 
             return Ok(categoria);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Ocorreu um problema ao tratar sua solicitação!");
-            }
-
         }
 
         [HttpDelete("{id:int}")]
         public ActionResult Delete(int id)
         {
-            try
-            {
+            _logger.LogInformation("***************** DELETE  API/CATEGORIAS/ID ***************** ");
+
             var categoria = _context.Categorias.FirstOrDefault(p => p.CategoriaId == id);
 
             //Usando o Find, ele tenta localizar primeiro na memória, porem a chave deve ser uma Primary Key
@@ -123,12 +99,7 @@ namespace APICatalogo.Controllers
             _context.SaveChanges();
 
             return Ok(categoria);
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    "Ocorreu um problema ao tratar sua solicitação!");
-            }
+
         }
 
     }
