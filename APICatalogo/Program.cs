@@ -8,8 +8,15 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+//ADD filter global
+builder.Services.AddControllers(oprtions =>
+{
+    oprtions.Filters.Add(typeof(ApiExceptionFilter));
+})
+    .AddJsonOptions(oprtions =>
+    {
+        oprtions.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -24,10 +31,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<ApiLoggingFilter>();
 
 //ADD logger customizado
-//builder.Logging.AddProvider(new CustomerLoggerProvider(new CustomLoggerProviderConfiguration
-//{
-//    LogLevel = LogLevel.Information
-//}));
+builder.Logging.AddProvider(new CustomerLoggerProvider(new CustomLoggerProviderConfiguration
+{
+    LogLevel = LogLevel.Information
+}));
 
 var app = builder.Build();
 
